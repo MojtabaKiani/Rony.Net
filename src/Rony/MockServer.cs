@@ -16,7 +16,7 @@ namespace Rony.Net
         public int Port => _listener.Port;
         public bool Active => _listener.Active;
         public RequestHandler Mock { get; set; }
-        
+
         public MockServer(IListener listener)
         {
             _syncRoot = new object();

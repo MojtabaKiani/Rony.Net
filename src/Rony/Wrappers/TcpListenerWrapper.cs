@@ -8,7 +8,7 @@ namespace Rony.Wrappers
     /// </summary>
     public class TcpListenerWrapper : TcpListener
     {
-         public TcpListenerWrapper(IPEndPoint localEp) : base(localEp)
+        public TcpListenerWrapper(IPEndPoint localEp) : base(localEp)
         {
         }
 

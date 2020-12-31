@@ -11,7 +11,7 @@ namespace Rony.Handlers
 
         public RequestHandler()
         {
-            Configs=new Dictionary<string, string>();
+            Configs = new Dictionary<string, string>();
         }
 
         public RequestHandler Send(string receiveData)

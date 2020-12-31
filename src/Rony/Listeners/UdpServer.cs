@@ -33,6 +33,7 @@ namespace Rony.Listeners
 
         public async Task<Message> ReceiveAsync()
         {
+            IPEndPoint remoteEndPoint = new IPEndPoint(IPAddress.Any, 0);
             var request = await _listener.ReceiveAsync();
             return new Message(request.Buffer, request.RemoteEndPoint);
         }
@@ -45,7 +46,7 @@ namespace Rony.Listeners
 
         public void Start()
         {
-            
+
         }
 
         public void Stop()

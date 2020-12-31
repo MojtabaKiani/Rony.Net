@@ -8,7 +8,7 @@
             Sender = sender;
         }
 
-        public Message(string body, object sender) : this (body.GetBytes(),sender)
+        public Message(string body, object sender) : this(body.GetBytes(), sender)
         {
         }
 
