@@ -47,7 +47,7 @@ namespace Rony.Handlers
 
         public string Match(string request)
         {
-            return Configs.LastOrDefault(x => x.Key == request).Value;
+            return Configs.FirstOrDefault(x => x.Key == request).Value;
         }
     }
 }
