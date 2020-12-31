@@ -1,3 +1,5 @@
+[![NuGet version](https://badge.fury.io/nu/Rony.Net.svg)](https://badge.fury.io/nu/Rony.Net)
+
 # Rony.Net
 A simple TCP/UDP server for using in test projects which test .net core based projects.
 
