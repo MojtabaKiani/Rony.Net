@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Rony.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -7,11 +8,11 @@ namespace Rony.Handlers
     public class RequestHandler
     {
         private string _receiveData;
-        public Dictionary<string, string> Configs { get; set; }
+        public List<Config> Configs { get; set; }
 
         public RequestHandler()
         {
-            Configs = new Dictionary<string, string>();
+            Configs = new List<Config>();
         }
 
         public RequestHandler Send(string receiveData)
@@ -27,30 +28,32 @@ namespace Rony.Handlers
 
         public void Receive(string response)
         {
-            Configs.Add(_receiveData, response);
+            Configs.Add(new Config(_receiveData, response));
         }
 
         public void Receive(byte[] response)
         {
-            Receive(response.GetString());
+            Configs.Add(new Config(_receiveData, response.GetString()));
         }
 
         public void Receive(Func<string, string> func)
         {
-            Receive(func(_receiveData));
+            Configs.Add(new Config(_receiveData, func));
         }
 
         public void Receive(Func<byte[], byte[]> func)
         {
-            Receive(func(_receiveData.GetBytes()));
+            Configs.Add(new Config(_receiveData, func));
+
         }
 
         public string Match(string request)
         {
-            var response= Configs.FirstOrDefault(x => x.Key == request).Value;
-            if (string.IsNullOrEmpty(response))
-                response =Configs.FirstOrDefault(x => x.Key=="").Value;
-            return response;
+            var config = Configs.FirstOrDefault(x => x.Request == request);
+            if (config == null)
+                config = Configs.FirstOrDefault(x => x.Request == "");
+            if (config == null) return "";
+            return config.GetResponse(request);
         }
     }
 }
