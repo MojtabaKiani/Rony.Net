@@ -37,10 +37,7 @@ namespace Rony.Net
                 {
                     var received = await _listener.ReceiveAsync();
                     var response = Mock.Match(received.BodyString);
-                    if (response != "")
-                    {
-                        await _listener.ReplyAsync(response, received.Sender);
-                    }
+                    await _listener.ReplyAsync(response, received.Sender);
                 }
             });
         }

@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <PackageId>Rony.Net</PackageId>
-    <Version>0.1.0</Version>
+    <Version>0.1.1</Version>
     <Authors>Mojtaba Kiani</Authors>
     <Product>Rony.Net</Product>
     <Description>A simple TCP/UDP server for using in test projects which test .net core based projects.</Description>

@@ -91,5 +91,20 @@ namespace Rony.Tests.Handler
             Assert.Single(_handler.Configs);
             Assert.True(expectedResponse.SequenceEqual(receivedBytes));
         }
+
+        [Fact]
+        public void Config_With_Empty_String_Should_Match_Any_Request()
+        {
+            //Arrange
+            var expectedResponse = new byte[] { 1, 3, 5, 7, 9 };
+
+            //Act
+            _handler.Send("").Receive("I match Everything");
+            var received = _handler.Match("Try to match");
+
+            //Assert
+            Assert.Single(_handler.Configs);
+            Assert.Equal("I match Everything",received);
+        }
     }
 }

@@ -33,6 +33,58 @@ namespace Rony.FunctionalTests
             Assert.True(response.Buffer.SequenceEqual(new byte[] { 2, 10, 3 }));
         }
 
+        [Theory]
+        [InlineData("Match me")]
+        [InlineData("12345")]
+        [InlineData("****@#")]
+        [InlineData("Match me too")]
+        public async void Server_Should_Return_Response_To_Any_Request_When_An_Empty_Request_Exists(string request)
+        {
+            //Arrange
+            const int port = 3000;
+            using var server = new MockServer(new UdpServer(port));
+
+            //Act
+            server.Mock.Send("").Receive("I match everything");
+            server.Start();
+            var client = new UdpClient();
+            client.Connect(IPAddress.Parse("127.0.0.1"), port);
+            var requestBytes = request.GetBytes();
+            await client.SendAsync(requestBytes, requestBytes.Length);
+            var response = await client.ReceiveAsync();
+            client.Close();
+            server.Stop();
+
+            //Assert
+            Assert.Equal("I match everything", response.Buffer.GetString());
+        }
+
+        [Theory]
+        [InlineData("Match me")]
+        [InlineData("12345")]
+        [InlineData("****@#")]
+        [InlineData("Match me too")]
+        public async void Server_Should_Return_Nothing_When_No_Match_Exists(string request)
+        {
+            //Arrange
+            const int port = 3000;
+            using var server = new MockServer(new UdpServer(port));
+
+            //Act
+            server.Mock.Send("Main Request").Receive(x => new byte[] { x[1], 10, x[2] });
+            server.Start();
+            var client = new UdpClient();
+            client.Connect(IPAddress.Parse("127.0.0.1"), port);
+            var requestBytes = request.GetBytes();
+            await client.SendAsync(requestBytes, requestBytes.Length);
+            var response = await client.ReceiveAsync();
+            client.Close();
+            server.Stop();
+
+            //Assert
+            Assert.Empty(response.Buffer);
+        }
+
         [Fact]
         public async void Server_Should_Return_Correct_Response_On_Multiple_Requests()
         {

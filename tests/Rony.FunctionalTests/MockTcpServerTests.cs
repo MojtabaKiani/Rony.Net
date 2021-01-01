@@ -34,6 +34,60 @@ namespace Rony.FunctionalTests
             Assert.True(response.Take(bytes).SequenceEqual(new byte[] { 2, 10, 3 }));
         }
 
+        [Theory]
+        [InlineData("Match me")]
+        [InlineData("12345")]
+        [InlineData("****@#")]
+        [InlineData("Match me too")]
+        public async void Server_Should_Return_Response_To_Any_Request_When_An_Empty_Request_Exists(string request)
+        {
+            //Arrange
+            using var server = new MockServer(new TcpServer(3000));
+            using var client = new TcpClient();
+
+            //Act
+            server.Mock.Send("").Receive("I match everything");
+            server.Start();
+            await client.ConnectAsync(IPAddress.Parse("127.0.0.1"), 3000);
+            using var stream = client.GetStream();
+            var requestBytes = request.GetBytes();
+            await stream.WriteAsync(requestBytes, 0, requestBytes.Length);
+            var response = new byte[client.ReceiveBufferSize];
+            var bytes = await stream.ReadAsync(response, 0, response.Length);
+            client.Close();
+            server.Stop();
+
+            //Assert
+            Assert.Equal("I match everything", response.Take(bytes).ToArray().GetString());
+        }
+
+        [Theory]
+        [InlineData("Match me")]
+        [InlineData("12345")]
+        [InlineData("****@#")]
+        [InlineData("Match me too")]
+        public async void Server_Should_Return_Nothing_When_No_Match_Exists(string request)
+        {
+            //Arrange
+            using var server = new MockServer(new TcpServer(3000));
+            using var client = new TcpClient();
+
+            //Act
+            server.Mock.Send("Main Request").Receive(x => new byte[] { x[1], 10, x[2] });
+            server.Start();
+            await client.ConnectAsync(IPAddress.Parse("127.0.0.1"), 3000);
+            using var stream = client.GetStream();
+            var requestBytes = request.GetBytes();
+            await stream.WriteAsync(requestBytes, 0, requestBytes.Length);
+            var response = new byte[client.ReceiveBufferSize];
+            var bytes = await stream.ReadAsync(response, 0, response.Length);
+            client.Close();
+            server.Stop();
+
+            //Assert
+            Assert.Equal(0,bytes);
+        }
+
         [Fact]
         public async void Server_Should_Return_Correct_Response_On_Multiple_Requests()
         {

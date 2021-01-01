@@ -56,8 +56,11 @@ namespace Rony.Listeners
         public async Task ReplyAsync(string response, object sender)
         {
             var sslStream = (SslStream)sender;
-            var responseBytes = response.GetBytes();
-            await sslStream.WriteAsync(responseBytes, 0, responseBytes.Length);
+            if (!string.IsNullOrEmpty(response))
+            {
+                var responseBytes = response.GetBytes();
+                await sslStream.WriteAsync(responseBytes, 0, responseBytes.Length);
+            }
             sslStream.Close();
             sslStream.Dispose();
         }
