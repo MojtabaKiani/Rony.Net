@@ -9,24 +9,20 @@ namespace Rony.Models
     public class Config
     {
 
-        public Config(string request, string response)
+        public Config(string response)
         {
-            Request = request;
             Response = response;
         }
-        public Config(string request, Func<string, string> stringFunc)
+        public Config(Func<string, string> stringFunc)
         {
-            Request = request;
             StringFunc = stringFunc;
         }
 
-        public Config(string request, Func<byte[], byte[]> byteFunc)
+        public Config(Func<byte[], byte[]> byteFunc)
         {
-            Request = request;
             ByteFunc = byteFunc;
         }
 
-        public string Request { get; private set; }
         private string Response { get; set; }
         private Func<string, string> StringFunc { get; set; } = null;
         private Func<byte[], byte[]> ByteFunc { get; set; } = null;

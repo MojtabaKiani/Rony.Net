@@ -27,7 +27,7 @@ namespace Rony.FunctionalTests
             await stream.WriteAsync(request, 0, request.Length);
             var response = new byte[client.ReceiveBufferSize];
             var bytes = await stream.ReadAsync(response, 0, response.Length);
-            client.Close();
+    51            client.Close();
             server.Stop();
 
             //Assert
