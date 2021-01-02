@@ -12,7 +12,7 @@
     <RepositoryUrl>https://github.com/MojtabaKiani/Rony.Net</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageTags>csharp;mock;mock-server;tcp-mock-server;udp-mock-server;ssl;tcp;udp;xunit;unit-testing;functional-testing;clean-code;clean-architecture</PackageTags>
-    <PackageReleaseNotes>First release including TCP Server, TCP Server with SSL/TLS support &amp; UDP Server</PackageReleaseNotes>
+    <PackageReleaseNotes>Changed server loginc for adding any request feature to it, and solve some minor bugs</PackageReleaseNotes>
     <NeutralLanguage>en</NeutralLanguage>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>

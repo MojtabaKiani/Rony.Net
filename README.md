@@ -45,13 +45,17 @@ var client = new UdpClient();
 client.Connect(IPAddress.Parse("127.0.0.1"), 5000);
 ```
 
-You can use `server.Mock` to manage Send/Receive data, then server will return configured data, based on sent data:
+You can use `mockServer.Mock` to manage Send/Receive data, then server will return configured data, based on sent data:
 ```csharp
 mockServer.Mock.Send("Test String").Receive("Test Response");
 mockServer.Mock.Send(new byte[] { 1, 2, 3 }).Receive(new byte[] { 3, 2, 1 });
 mockServer.Mock.Send("abcd").Receive(x=> x.ToUpper());
 ```
-
+An important option in using `mockServer.Mock` is adding anything request to it, then it will reply to any unconfigured request base on this config, you can config
+server for this option by using an empty string in `Send` method, just like below :
+```csharp
+mockServer.Mock.Send("").Receive("Test Response");
+```
 You can use `mockServer.Mock` either before or after `mockServer.Run()`. For more details please check Test projects.
 
 ## Compile
