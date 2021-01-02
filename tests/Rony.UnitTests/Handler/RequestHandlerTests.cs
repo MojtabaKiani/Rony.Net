@@ -83,7 +83,7 @@ namespace Rony.Tests.Handler
             var expectedResponse = new byte[] { 1, 3, 5, 7, 9 };
 
             //Act
-            _handler.Send(request).Receive((x => x.Select((s,i)=> (s,i)).Where(t=> t.i % 2 ==0).Select(t=> t.s).ToArray()));
+            _handler.Send(request).Receive(x => x.Select((s,i)=> (s,i)).Where(t=> t.i % 2 ==0).Select(t=> t.s).ToArray());
             var received = _handler.Match(Encoding.UTF8.GetString(request));
             var receivedBytes = Encoding.UTF8.GetBytes(received);
 
@@ -92,19 +92,56 @@ namespace Rony.Tests.Handler
             Assert.True(expectedResponse.SequenceEqual(receivedBytes));
         }
 
-        [Fact]
-        public void Config_With_Empty_String_Should_Match_Any_Request()
+        [Theory]
+        [InlineData("Try Me")]
+        [InlineData("123456")]
+        [InlineData("Try @76453")]
+        [InlineData(" ")]
+        [InlineData("&#^@%")]
+        public void Config_With_Empty_String_Should_Match_Any_Request(string request)
         {
-            //Arrange
-            var expectedResponse = new byte[] { 1, 3, 5, 7, 9 };
-
             //Act
             _handler.Send("").Receive("I match Everything");
-            var received = _handler.Match("Try to match");
+            var received = _handler.Match(request);
 
             //Assert
             Assert.Single(_handler.Configs);
             Assert.Equal("I match Everything",received);
+        }
+
+        [Theory]
+        [InlineData("Try Me")]
+        [InlineData("123456")]
+        [InlineData("Try @76453")]
+        [InlineData(" ")]
+        [InlineData("&#^@%")]
+        public void Config_With_Empty_String_Should_Match_Any_Request_With_Func_Of_String(string request)
+        {
+            //Act
+            _handler.Send("").Receive(x=> x.ToUpper());
+            var received = _handler.Match(request);
+
+            //Assert
+            Assert.Single(_handler.Configs);
+            Assert.Equal(request.ToUpper(), received);
+        }
+
+
+        [Theory]
+        [InlineData("Try Me")]
+        [InlineData("123456")]
+        [InlineData("Try @76453")]
+        [InlineData(" 33")]
+        [InlineData("&#^@%")]
+        public void Config_With_Empty_String_Should_Match_Any_Request_With_Func_Of_Byte(string request)
+        {
+            //Act
+            _handler.Send("").Receive(x => x.Take(3).ToArray());
+            var received = _handler.Match(request);
+
+            //Assert
+            Assert.Single(_handler.Configs);
+            Assert.Equal(request.Substring(0,3), received);
         }
     }
 }

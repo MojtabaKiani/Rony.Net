@@ -201,5 +201,61 @@ namespace Rony.FunctionalTests
 
             return false;
         }
+
+        [Theory]
+        [InlineData("Match Me", "MtM")]
+        [InlineData("0123456789", "026")]
+        [InlineData("Try Me too", "Ty ")]
+        [InlineData("@762Rt%", "@6%")]
+        public async void Server_Should_Return_Correct_Response_Where_Configed_With_Enything_And_Func_Of_Byte(string request, string expected)
+        {
+            //Arrange
+            const int port = 3205;
+            using var server = new MockServer(new TcpServerSsl(port, _certificateName, SslProtocols.None));
+            using var client = new TcpClient();
+
+            //Act
+            server.Mock.Send("").Receive(x => new byte[] { x[0], x[2], x[6] });
+            server.Start();
+            await client.ConnectAsync(IPAddress.Parse("127.0.0.1"), port);
+            await using var sslStream = new SslStream(client.GetStream(), false, new RemoteCertificateValidationCallback(CertificateValidationCallback));
+            await sslStream.AuthenticateAsClientAsync(_certificateName);
+            await sslStream.WriteAsync(request.GetBytes(), 0, request.Length);
+            var response = new byte[client.ReceiveBufferSize];
+            var bytes = await sslStream.ReadAsync(response, 0, response.Length);
+            client.Close();
+            server.Stop();
+
+            //Assert
+            Assert.Equal(expected, response.Take(bytes).ToArray().GetString());
+        }
+
+        [Theory]
+        [InlineData("Match Me", "MATC")]
+        [InlineData("0123456789", "0123")]
+        [InlineData("Try Me too", "TRY ")]
+        [InlineData("@762Rt%", "@762")]
+        public async void Server_Should_Return_Correct_Response_Where_Configed_With_Enything_And_Func_Of_String(string request, string expected)
+        {
+            //Arrange
+            const int port = 3206;
+            using var server = new MockServer(new TcpServerSsl(port, _certificateName, SslProtocols.None));
+            using var client = new TcpClient();
+
+            //Act
+            server.Mock.Send("").Receive(x => x.Substring(0,4).ToUpper());
+            server.Start();
+            await client.ConnectAsync(IPAddress.Parse("127.0.0.1"), port);
+            await using var sslStream = new SslStream(client.GetStream(), false, new RemoteCertificateValidationCallback(CertificateValidationCallback));
+            await sslStream.AuthenticateAsClientAsync(_certificateName);
+            await sslStream.WriteAsync(request.GetBytes(), 0, request.Length);
+            var response = new byte[client.ReceiveBufferSize];
+            var bytes = await sslStream.ReadAsync(response, 0, response.Length);
+            client.Close();
+            server.Stop();
+
+            //Assert
+            Assert.Equal(expected, response.Take(bytes).ToArray().GetString());
+        }
     }
 }

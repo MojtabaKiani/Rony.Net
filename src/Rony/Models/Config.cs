@@ -29,9 +29,17 @@ namespace Rony.Models
 
         public string GetResponse(string request)
         {
-            if (StringFunc != null) return StringFunc(request);
-            if (ByteFunc != null) return ByteFunc(request.GetBytes()).GetString();
-            return Response;
+            try
+            {
+                if (StringFunc != null) return StringFunc(request);
+                if (ByteFunc != null) return ByteFunc(request.GetBytes()).GetString();
+                return Response;
+            }
+            catch (Exception)
+            {
+            }
+
+            return "";
         }
     }
 }

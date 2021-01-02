@@ -166,5 +166,56 @@ namespace Rony.FunctionalTests
                 server.Stop();
             }
         }
+
+        [Theory]
+        [InlineData("Match Me", "MtM")]
+        [InlineData("0123456789", "026")]
+        [InlineData("Try Me too", "Ty ")]
+        [InlineData("@762Rt%", "@6%")]
+        public async void Server_Should_Return_Correct_Response_Where_Configed_With_Enything_And_Func_Of_Byte(string request, string expected)
+        {
+            //Arrange
+            const int port = 3105;
+            using var server = new MockServer(new UdpServer(port));
+
+            //Act
+            server.Mock.Send("").Receive(x => new byte[] { x[0], x[2], x[6] });
+            server.Start();
+            var client = new UdpClient();
+            client.Connect(IPAddress.Parse("127.0.0.1"), port);
+            await client.SendAsync(request.GetBytes(), request.Length);
+            var response = await client.ReceiveAsync();
+            client.Close();
+            server.Stop();
+
+            //Assert
+            Assert.Equal(expected, response.Buffer.GetString());
+        }
+
+
+        [Theory]
+        [InlineData("Match Me", "MATC")]
+        [InlineData("0123456789", "0123")]
+        [InlineData("Try Me too", "TRY ")]
+        [InlineData("@762Rt%", "@762")]
+        public async void Server_Should_Return_Correct_Response_Where_Configed_With_Enything_And_Func_Of_String(string request, string expected)
+        {
+            //Arrange
+            const int port = 3106;
+            using var server = new MockServer(new UdpServer(port));
+
+            //Act
+            server.Mock.Send("").Receive(x => x.Substring(0, 4).ToUpper());
+            server.Start();
+            var client = new UdpClient();
+            client.Connect(IPAddress.Parse("127.0.0.1"), port);
+            await client.SendAsync(request.GetBytes(), request.Length);
+            var response = await client.ReceiveAsync();
+            client.Close();
+            server.Stop();
+
+            //Assert
+            Assert.Equal(expected, response.Buffer.GetString());
+        }
     }
 }
