@@ -47,12 +47,12 @@ namespace Rony.Handlers
 
         }
 
-        public string Match(string request)
+        public byte[] Match(string request)
         {
             var config = Configs.FirstOrDefault(x => x.Key == request);
             if (config.Equals(new KeyValuePair<string, Config>()))
                 config = Configs.FirstOrDefault(x => x.Key == "");
-            if (config.Equals(new KeyValuePair<string, Config>())) return "";
+            if (config.Equals(new KeyValuePair<string, Config>())) return new byte[] { };
             return config.Value.GetResponse(request);
         }
     }

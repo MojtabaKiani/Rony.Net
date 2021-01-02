@@ -12,7 +12,8 @@ namespace Rony.Interfaces
         bool Active { get; }
 
         Task<Message> ReceiveAsync();
-        Task ReplyAsync(string text, object sender);
+        Task ReplyAsync(string response, object sender);
+        Task ReplyAsync(byte[] response, object sender);
         void Stop();
         void Start();
     }

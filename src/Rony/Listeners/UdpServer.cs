@@ -39,12 +39,14 @@ namespace Rony.Listeners
 
         public async Task ReplyAsync(string response, object sender)
         {
-            if (response == null)
-                response = "";
-            var endPoint = (IPEndPoint)sender;
-            await _listener.SendAsync(response.GetBytes(), response.Length, endPoint);
+            await ReplyAsync(response.GetBytes(), sender);
         }
 
+        public async Task ReplyAsync(byte[] response, object sender)
+        {
+            var endPoint = (IPEndPoint)sender;
+            await _listener.SendAsync(response, response.Length, endPoint);
+        }
         public void Start()
         {
         }

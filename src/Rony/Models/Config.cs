@@ -27,19 +27,19 @@ namespace Rony.Models
         private Func<string, string> StringFunc { get; set; } = null;
         private Func<byte[], byte[]> ByteFunc { get; set; } = null;
 
-        public string GetResponse(string request)
+        public byte[] GetResponse(string request)
         {
             try
             {
-                if (StringFunc != null) return StringFunc(request);
-                if (ByteFunc != null) return ByteFunc(request.GetBytes()).GetString();
-                return Response;
+                if (StringFunc != null) return StringFunc(request).GetBytes();
+                if (ByteFunc != null) return ByteFunc(request.GetBytes());
+                return Response.GetBytes();
             }
             catch (Exception)
             {
             }
 
-            return "";
+            return new byte[] { };
         }
     }
 }

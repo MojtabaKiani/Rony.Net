@@ -49,12 +49,14 @@ namespace Rony.Listeners
 
         public async Task ReplyAsync(string response, object sender)
         {
+            await ReplyAsync(response.GetBytes(), sender);
+        }
+
+        public async Task ReplyAsync(byte[] response, object sender)
+        {
             var stream = (NetworkStream)sender;
-            if (!string.IsNullOrEmpty(response))
-            {
-                var responseBytes = response.GetBytes();
-                await stream.WriteAsync(responseBytes, 0, responseBytes.Length);
-            }
+            if (response.Length > 0)
+                await stream.WriteAsync(response, 0, response.Length);
             stream.Close();
             stream.Dispose();
         }
