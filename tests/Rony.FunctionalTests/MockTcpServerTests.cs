@@ -15,19 +15,20 @@ namespace Rony.FunctionalTests
         public async void Server_Should_Return_Correct_Response()
         {
             //Arrange
-            using var server = new MockServer(new TcpServer(3000));
+            const int port = 3005;
+            using var server = new MockServer(new TcpServer(port));
             var request = new byte[] { 1, 2, 3 };
             using var client = new TcpClient();
 
             //Act
             server.Mock.Send(request).Receive(x => new byte[] { x[1], 10, x[2] });
             server.Start();
-            await client.ConnectAsync(IPAddress.Parse("127.0.0.1"), 3000);
+            await client.ConnectAsync(IPAddress.Parse("127.0.0.1"), port);
             using var stream = client.GetStream();
             await stream.WriteAsync(request, 0, request.Length);
             var response = new byte[client.ReceiveBufferSize];
             var bytes = await stream.ReadAsync(response, 0, response.Length);
-    51            client.Close();
+            client.Close();
             server.Stop();
 
             //Assert
@@ -42,13 +43,14 @@ namespace Rony.FunctionalTests
         public async void Server_Should_Return_Response_To_Any_Request_When_An_Empty_Request_Exists(string request)
         {
             //Arrange
-            using var server = new MockServer(new TcpServer(3000));
+            const int port = 3001;
+            using var server = new MockServer(new TcpServer(port));
             using var client = new TcpClient();
 
             //Act
             server.Mock.Send("").Receive("I match everything");
             server.Start();
-            await client.ConnectAsync(IPAddress.Parse("127.0.0.1"), 3000);
+            await client.ConnectAsync(IPAddress.Parse("127.0.0.1"), port);
             using var stream = client.GetStream();
             var requestBytes = request.GetBytes();
             await stream.WriteAsync(requestBytes, 0, requestBytes.Length);
@@ -69,13 +71,14 @@ namespace Rony.FunctionalTests
         public async void Server_Should_Return_Nothing_When_No_Match_Exists(string request)
         {
             //Arrange
-            using var server = new MockServer(new TcpServer(3000));
+            const int port = 3002;
+            using var server = new MockServer(new TcpServer(port));
             using var client = new TcpClient();
 
             //Act
             server.Mock.Send("Main Request").Receive(x => new byte[] { x[1], 10, x[2] });
             server.Start();
-            await client.ConnectAsync(IPAddress.Parse("127.0.0.1"), 3000);
+            await client.ConnectAsync(IPAddress.Parse("127.0.0.1"), port);
             using var stream = client.GetStream();
             var requestBytes = request.GetBytes();
             await stream.WriteAsync(requestBytes, 0, requestBytes.Length);
@@ -85,14 +88,15 @@ namespace Rony.FunctionalTests
             server.Stop();
 
             //Assert
-            Assert.Equal(0,bytes);
+            Assert.Equal(0, bytes);
         }
 
         [Fact]
         public async void Server_Should_Return_Correct_Response_On_Multiple_Requests()
         {
             //Arrange
-            using var server = new MockServer(new TcpServer(3000));
+            const int port = 3003;
+            using var server = new MockServer(new TcpServer(port));
             using var client = new TcpClient();
 
             //Act
@@ -100,7 +104,7 @@ namespace Rony.FunctionalTests
             server.Mock.Send("ABC").Receive("CBA");
             server.Mock.Send("!@#").Receive("$%^");
             server.Start();
-            await client.ConnectAsync(IPAddress.Parse("127.0.0.1"), 3000);
+            await client.ConnectAsync(IPAddress.Parse("127.0.0.1"), port);
             using var stream = client.GetStream();
             await stream.WriteAsync("ABC".GetBytes(), 0, 3);
             var response = new byte[client.ReceiveBufferSize];
@@ -116,7 +120,8 @@ namespace Rony.FunctionalTests
         public async void Server_Should_Return_Correct_Response_On_Many_Request()
         {
             //Arrange
-            using var server = new MockServer(new TcpServer(3000));
+            const int port = 3006;
+            using var server = new MockServer(new TcpServer(port));
 
             //Act
             for (int i = 0; i < 10000; i++)
@@ -125,7 +130,7 @@ namespace Rony.FunctionalTests
             for (int i = 0; i < 10000; i++)
             {
                 using var client = new TcpClient();
-                await client.ConnectAsync(IPAddress.Parse("127.0.0.1"), 3000);
+                await client.ConnectAsync(IPAddress.Parse("127.0.0.1"), port);
                 using var stream = client.GetStream();
                 var response = new byte[client.ReceiveBufferSize];
                 var request = i.ToString().GetBytes();

@@ -11,11 +11,12 @@ using System.Threading;
 using Xunit;
 
 namespace Rony.FunctionalTests
-{/// <summary>
-/// You should have a cerificate with below name in your machine certificates, to pass these tests.
-/// If you don't have please create or change the name to certicate you already have.
-/// And ofcourse you should have read permission on certificate's private key
-/// </summary>
+{
+    /// <summary>
+    /// You should have a cerificate with below name in your machine certificates, to pass these tests.
+    /// If you don't have please create or change the name to certicate you already have.
+    /// And ofcourse you should have read permission on certificate's private key
+    /// </summary>
     public class MockTcpServerSslTests
     {
         private readonly string _certificateName = "localhost";
@@ -24,14 +25,15 @@ namespace Rony.FunctionalTests
         public async void Server_Should_Return_Correct_Response()
         {
             //Arrange
-            var server = new MockServer(new TcpServerSsl(3000, _certificateName, SslProtocols.None));
+            const int port = 3200;
+            using var server = new MockServer(new TcpServerSsl(port, _certificateName, SslProtocols.None));
             var request = new byte[] { 1, 2, 3 };
             using var client = new TcpClient();
 
             //Act
             server.Mock.Send(request).Receive(x => new byte[] { x[1], 10, x[2] });
             server.Start();
-            await client.ConnectAsync(IPAddress.Parse("127.0.0.1"), 3000);
+            await client.ConnectAsync(IPAddress.Parse("127.0.0.1"), port);
             await using var sslStream = new SslStream(client.GetStream(), false, new RemoteCertificateValidationCallback(CertificateValidationCallback));
             await sslStream.AuthenticateAsClientAsync(_certificateName);
             await sslStream.WriteAsync(request, 0, request.Length);
@@ -52,13 +54,14 @@ namespace Rony.FunctionalTests
         public async void Server_Should_Return_Response_To_Any_Request_When_An_Empty_Request_Exists(string request)
         {
             //Arrange
-            var server = new MockServer(new TcpServerSsl(3000, _certificateName, SslProtocols.None));
+            const int port = 3201;
+            using var server = new MockServer(new TcpServerSsl(port, _certificateName, SslProtocols.None));
             using var client = new TcpClient();
 
             //Act
             server.Mock.Send("").Receive("I match everything");
             server.Start();
-            await client.ConnectAsync(IPAddress.Parse("127.0.0.1"), 3000);
+            await client.ConnectAsync(IPAddress.Parse("127.0.0.1"), port);
             await using var sslStream = new SslStream(client.GetStream(), false, new RemoteCertificateValidationCallback(CertificateValidationCallback));
             await sslStream.AuthenticateAsClientAsync(_certificateName);
             var requestBytes = request.GetBytes();
@@ -80,13 +83,14 @@ namespace Rony.FunctionalTests
         public async void Server_Should_Return_Nothing_When_No_Match_Exists(string request)
         {
             //Arrange
-            var server = new MockServer(new TcpServerSsl(3000, _certificateName, SslProtocols.None));
+            const int port = 3202;
+            using var server = new MockServer(new TcpServerSsl(port, _certificateName, SslProtocols.None));
             using var client = new TcpClient();
 
             //Act
             server.Mock.Send("Main Request").Receive(x => new byte[] { x[1], 10, x[2] });
             server.Start();
-            await client.ConnectAsync(IPAddress.Parse("127.0.0.1"), 3000);
+            await client.ConnectAsync(IPAddress.Parse("127.0.0.1"), port);
             await using var sslStream = new SslStream(client.GetStream(), false, new RemoteCertificateValidationCallback(CertificateValidationCallback));
             await sslStream.AuthenticateAsClientAsync(_certificateName);
             var requestBytes = request.GetBytes();
@@ -104,7 +108,8 @@ namespace Rony.FunctionalTests
         public async void Server_Should_Return_Correct_Response_On_Multiple_Requests()
         {
             //Arrange
-            using var server = new MockServer(new TcpServerSsl(3001, _certificateName, SslProtocols.None));
+            const int port = 3203;
+            using var server = new MockServer(new TcpServerSsl(port, _certificateName, SslProtocols.None));
             using var client = new TcpClient();
 
             //Act
@@ -112,7 +117,7 @@ namespace Rony.FunctionalTests
             server.Mock.Send("ABC").Receive("CBA");
             server.Mock.Send("!@#").Receive("$%^");
             server.Start();
-            await client.ConnectAsync(IPAddress.Parse("127.0.0.1"), 3001);
+            await client.ConnectAsync(IPAddress.Parse("127.0.0.1"), port);
             await using var sslStream = new SslStream(client.GetStream(), false, new RemoteCertificateValidationCallback(CertificateValidationCallback));
             await sslStream.AuthenticateAsClientAsync(_certificateName);
             await sslStream.WriteAsync("ABC".GetBytes(), 0, 3);
@@ -129,7 +134,8 @@ namespace Rony.FunctionalTests
         public async void Server_Should_Return_Correct_Response_On_Many_Request()
         {
             //Arrange
-            using var server = new MockServer(new TcpServerSsl(3002, _certificateName, SslProtocols.None));
+            const int port = 3204;
+            using var server = new MockServer(new TcpServerSsl(port, _certificateName, SslProtocols.None));
 
             //Act
             for (int i = 0; i < 10000; i++)
@@ -138,7 +144,7 @@ namespace Rony.FunctionalTests
             for (int i = 0; i < 10000; i++)
             {
                 using var client = new TcpClient();
-                await client.ConnectAsync(IPAddress.Parse("127.0.0.1"), 3002);
+                await client.ConnectAsync(IPAddress.Parse("127.0.0.1"), port);
                 await using var sslStream = new SslStream(client.GetStream(), false, new RemoteCertificateValidationCallback(CertificateValidationCallback));
                 await sslStream.AuthenticateAsClientAsync(_certificateName);
                 var response = new byte[client.ReceiveBufferSize];

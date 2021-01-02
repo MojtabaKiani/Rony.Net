@@ -15,7 +15,7 @@ namespace Rony.FunctionalTests
         public async void Server_Should_Return_Correct_Response()
         {
             //Arrange
-            const int port = 3000;
+            const int port = 3100;
             using var server = new MockServer(new UdpServer(port));
             var request = new byte[] { 1, 2, 3 };
 
@@ -41,7 +41,7 @@ namespace Rony.FunctionalTests
         public async void Server_Should_Return_Response_To_Any_Request_When_An_Empty_Request_Exists(string request)
         {
             //Arrange
-            const int port = 3000;
+            const int port = 3101;
             using var server = new MockServer(new UdpServer(port));
 
             //Act
@@ -67,7 +67,7 @@ namespace Rony.FunctionalTests
         public async void Server_Should_Return_Nothing_When_No_Match_Exists(string request)
         {
             //Arrange
-            const int port = 3000;
+            const int port = 3102;
             using var server = new MockServer(new UdpServer(port));
 
             //Act
@@ -89,7 +89,7 @@ namespace Rony.FunctionalTests
         public async void Server_Should_Return_Correct_Response_On_Multiple_Requests()
         {
             //Arrange
-            const int port = 3000;
+            const int port = 3103;
             using var server = new MockServer(new UdpServer(port));
 
             //Act
@@ -112,7 +112,7 @@ namespace Rony.FunctionalTests
         public async void Server_Should_Return_Correct_Response_On_Many_Request()
         {
             //Arrange
-            const int port = 3000;
+            const int port = 3104;
             using var server = new MockServer(new UdpServer(port));
 
             //Act
